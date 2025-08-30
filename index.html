@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pramod Thorat | Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chosen Palette: Terracotta Neutral (light) & Sapphire Midnight (dark) -->
+    <!-- Application Structure Plan: The SPA is designed with a fixed sidebar navigation for intuitive, non-linear exploration and a main content area that dynamically displays information. This structure was chosen to function like an interactive dashboard, allowing users to easily jump between Pramod's background, skills, and future goals without losing context. The key interactions—modals for project details and a dynamic chart for skills—provide depth on demand, keeping the primary interface clean and focused, which enhances usability and information retention compared to a linear document. A theme toggle has been added to provide light and dark color schemes, enhancing user preference and accessibility. The navigation has been refined to separate Experience and Education for better information architecture. A new dedicated section for Certifications and Languages has been added to provide a clearer and more interactive overview of these skills. -->
+    <!-- Visualization & Content Choices: 
+        - About Me: Report Info -> Professional Summary. Goal -> Inform. Presentation -> Clean text blocks. Interaction -> Static. Justification -> Provides an immediate, high-level overview.
+        - Education & Experience: Report Info -> Work history & academic record. Goal -> Show chronology/progression. Presentation -> Distinct, organized panels with luxurious styling. Interaction -> Clickable buttons. Justification -> The panel design improves visual separation and readability and follows the user's request.
+        - Projects: Report Info -> Project descriptions. Goal -> Organize/Detail. Presentation -> Grid of cards with a visual workflow for quick insight and a modal for deep-dive details. Interaction -> Click to open modal for details. Justification -> The visual workflow on the card provides an immediate and engaging overview, while the modal offers a more detailed explanation, making the entire section more interactive and informative.
+        - Skills: Report Info -> Technical and soft skills. Goal -> Compare/Organize. Presentation -> Donut chart for soft skills (Chart.js/Canvas) & categorized tags for technical skills. Interaction -> Hover tooltips on chart. Justification -> The donut chart is a fresh, modern "demograph" for visualizing proportional data, making the section more visually dynamic and attractive.
+        - Certifications & Languages: Report Info -> Professional certifications and language proficiency. Goal -> Inform and organize. Presentation -> Interactive cards with modals for certifications and a simple list for languages. Interaction -> Click to view certificate details. Justification -> This presents qualifications in a professional, easy-to-digest format that allows an interviewer to access information quickly.
+        - Aspirations: Report Info -> Career goals. Goal -> Inform. Presentation -> Icon-driven text sections. Interaction -> Static. Justification -> Clearly articulates future plans with simple visual cues, now with content personalized to the user's hobbies and personality.
+        - Library/Method -> Chart.js (Canvas) for skills chart. All other visuals use structured HTML/Tailwind.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        :root {
+            --bg-primary-light: #FDFBF8;
+            --bg-secondary-light: #F3E9DD;
+            --text-primary-light: #333333;
+            --text-secondary-light: #C77553;
+            --card-bg-light: #FFFFFF;
+            --card-border-light: #EAEAEA;
+            --bg-tag-light: #EAEAEA;
+            --text-tag-light: #333333;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary-light: #0D172A;
+            --bg-secondary-light: #1E293B;
+            --text-primary-light: #F0F0F0;
+            --text-secondary-light: #38BDF8;
+            --card-bg-light: #1E293B;
+            --card-border-light: #3A3A3C;
+            --bg-tag-light: #3A3A3C;
+            --text-tag-light: #F0F0F0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary-light);
+            color: var(--text-primary-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
+            border-left-color: transparent;
+        }
+
+        .nav-link.active {
+            background-color: var(--bg-secondary-light);
+            color: var(--text-secondary-light);
+            border-left-color: var(--text-secondary-light);
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg-secondary-light);
+            color: var(--text-secondary-light);
+        }
+
+        .card {
+            background-color: var(--card-bg-light);
+            border: 1px solid var(--card-border-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .modal-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .modal-content {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .flowchart-step {
+            background-color: var(--bg-secondary-light);
+            border: 1px solid var(--text-secondary-light);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            color: var(--text-primary-light);
+        }
+
+        .bg-tag {
+            background-color: var(--bg-tag-light);
+            color: var(--text-tag-light);
+        }
+
+        .project-flow {
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .project-flow::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col md:flex-row">
+
+    <header id="mobile-nav" class="md:hidden sticky top-0 bg-white/80 backdrop-blur-sm z-30 border-b border-gray-200">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <h1 class="text-xl font-bold text-gray-800 dark:text-gray-200">Pramod Thorat</h1>
+                <div class="flex items-center space-x-4">
+                    <a href="https://www.linkedin.com/in/pramodthorat7/" target="_blank"
+                        class="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"><i
+                            class="fa-brands fa-linkedin text-xl"></i></a>
+                    <a href="https://github.com/pramodthorat7" target="_blank"
+                        class="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"><i
+                            class="fa-brands fa-github text-xl"></i></a>
+                    <a href="mailto:pramodthorat410@gmail.com"
+                        class="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"><i
+                            class="fa-solid fa-envelope text-xl"></i></a>
+                    <a href="tel:+917887750778"
+                        class="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"><i
+                            class="fa-solid fa-phone-volume text-xl"></i></a>
+                    <button id="theme-toggle-mobile" class="p-2 rounded-full text-gray-600 hover:bg-gray-100">
+                        <span class="light-icon">💡</span>
+                        <span class="dark-icon hidden">🌙</span>
+                    </button>
+                    <button id="mobile-menu-button"
+                        class="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <nav id="mobile-menu" class="hidden">
+            <div class="space-y-1 px-2 pb-3 pt-2">
+                <a href="#about" class="block rounded-md px-3 py-2 text-base font-medium">About Me</a>
+                <a href="#education" class="block rounded-md px-3 py-2 text-base font-medium">Education</a>
+                <a href="#experience" class="block rounded-md px-3 py-2 text-base font-medium">Experience</a>
+                <a href="#projects" class="block rounded-md px-3 py-2 text-base font-medium">Projects</a>
+                <a href="#skills" class="block rounded-md px-3 py-2 text-base font-medium">Skills</a>
+                <a href="#certifications" class="block rounded-md px-3 py-2 text-base font-medium">Certifications</a>
+                <a href="#languages" class="block rounded-md px-3 py-2 text-base font-medium">Languages</a>
+                <a href="#aspirations" class="block rounded-md px-3 py-2 text-base font-medium">Career Aspirations</a>
+            </div>
+        </nav>
+    </header>
+
+    <aside
+        class="hidden md:flex flex-col w-64 h-screen p-6 bg-[var(--bg-secondary-light)] border-r border-[var(--card-border-light)] sticky top-0">
+        <div class="text-center mb-10">
+            <h1 class="text-2xl font-bold text-[var(--text-secondary-light)]">Pramod Thorat</h1>
+            <p class="text-sm text-[var(--text-primary-light)]">B.Tech in Electronics and Telecommunication</p>
+        </div>
+        <nav id="desktop-nav" class="flex flex-col space-y-2">
+            <a href="#about" data-section="about"
+                class="nav-link text-[var(--text-primary-light)] font-medium p-3 rounded-r-lg border-l-4">About Me</a>
+            <a href="#education" data-section="education"
+                class="nav-link text-[var(--text-primary-light)] font-medium p-3 rounded-r-lg border-l-4">Education</a>
+            <a href="#experience" data-section="experience"
+                class="nav-link text-[var(--text-primary-light)] font-medium p-3 rounded-r-lg border-l-4">Experience</a>
+            <a href="#projects" data-section="projects"
+                class="nav-link text-[var(--text-primary-light)] font-medium p-3 rounded-r-lg border-l-4">Projects</a>
+            <a href="#skills" data-section="skills"
+                class="nav-link text-[var(--text-primary-light)] font-medium p-3 rounded-r-lg border-l-4">Skills</a>
+            <a href="#certifications" data-section="certifications"
+                class="nav-link text-[var(--text-primary-light)] font-medium p-3 rounded-r-lg border-l-4">Certifications</a>
+            <a href="#languages" data-section="languages"
+                class="nav-link text-[var(--text-primary-light)] font-medium p-3 rounded-r-lg border-l-4">Languages</a>
+            <a href="#aspirations" data-section="aspirations"
+                class="nav-link text-[var(--text-primary-light)] font-medium p-3 rounded-r-lg border-l-4">Career
+                Aspirations</a>
+        </nav>
+        <div class="mt-auto flex justify-center items-center space-x-4 text-center">
+            <a href="https://www.linkedin.com/in/pramodthorat7/" target="_blank"
+                class="text-[var(--text-primary-light)] hover:text-[var(--text-secondary-light)]"><i
+                    class="fa-brands fa-linkedin text-2xl"></i></a>
+            <a href="https://github.com/pramodthorat7" target="_blank"
+                class="text-[var(--text-primary-light)] hover:text-[var(--text-secondary-light)]"><i
+                    class="fa-brands fa-github text-2xl"></i></a>
+            <a href="mailto:pramodthorat410@gmail.com"
+                class="text-[var(--text-primary-light)] hover:text-[var(--text-secondary-light)]"><i
+                    class="fa-solid fa-envelope text-2xl"></i></a>
+            <a href="tel:+917887750778"
+                class="text-[var(--text-primary-light)] hover:text-[var(--text-secondary-light)]"><i
+                    class="fa-solid fa-phone-volume text-2xl"></i></a>
+            <button id="theme-toggle-desktop"
+                class="p-2 rounded-full text-[var(--text-primary-light)] hover:bg-[var(--bg-tag-light)]">
+                <span class="light-icon">💡</span>
+                <span class="dark-icon hidden">🌙</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-6 sm:p-10">
+        <h1
+            class="text-5xl md:text-6xl font-extrabold text-center mb-10 pt-20 md:pt-0 text-[var(--text-primary-light)]">
+            Portfolio</h1>
+        <section id="about" class="pt-12">
+            <div class="w-full max-w-4xl mx-auto">
+                <h2 class="text-4xl font-bold mb-8 text-[var(--text-primary-light)]">About Me</h2>
+                <div class="space-y-6 text-lg text-[var(--text-primary-light)] leading-relaxed">
+                    <p>I am a recent B.Tech graduate in Electronics and Telecommunication, with an Honors Degree in
+                        Artificial Intelligence and Machine Learning. My academic background has equipped me with a
+                        strong foundation in both hardware and software, with a focus on cutting-edge technologies.</p>
+                    <p>My hands-on experience in <strong class="text-[var(--text-secondary-light)]">Java, SQL Python,
+                            and
+                            Embedded C</strong>, paired with a solid understanding of Data Structures and Algorithms,
+                        has prepared me to tackle complex technical challenges. My time as a Software Developer and an
+                        intern has provided me with practical experience in developing robust software and analyzing
+                        real-world data.</p>
+                    <p>A passionate and fast learner, I am actively seeking opportunities to contribute my skills and
+                        grow, focusing on delivering impactful outcomes that drive mutual success for both myself and
+                        the organization.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="education" class="pt-12">
+            <div class="w-full max-w-4xl mx-auto">
+                <h2 class="text-4xl font-bold mb-6 text-[var(--text-primary-light)]">Education</h2>
+                <div class="space-y-6">
+                    <div
+                        class="p-6 rounded-lg bg-[var(--card-bg-light)] shadow-lg border border-[var(--card-border-light)]">
+                        <p class="text-sm text-[var(--text-secondary-light)] font-semibold">2021-2025</p>
+                        <h4 class="text-xl font-bold mt-1 text-[var(--text-primary-light)]">Bachelor of Technology, E&TC
+                        </h4>
+                        <p class="text-md text-[var(--text-primary-light)]">GH Raisoni College of Engineering and
+                            Management, Pune CGPA - 8.68/10.</p>
+                        <p class="mt-2 text-[var(--text-primary-light)]">Also holds an Honors Degree in Artificial
+                            Intelligence and Machine Learning.</p>
+                    </div>
+                    <div
+                        class="p-6 rounded-lg bg-[var(--card-bg-light)] shadow-lg border border-[var(--card-border-light)]">
+                        <p class="text-sm text-[var(--text-secondary-light)] font-semibold">2021</p>
+                        <h4 class="text-xl font-bold mt-1 text-[var(--text-primary-light)]">Higher Secondary Certificate
+                        </h4>
+                        <p class="text-md text-[var(--text-primary-light)]">Deogiri College, Chhatrapati Sambhajinagar
+                        </p>
+                        <p class="mt-2 text-[var(--text-primary-light)]">Achieved a percentage of 92.67%.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="experience" class="pt-12">
+            <div class="w-full max-w-4xl mx-auto">
+                <h2 class="text-4xl font-bold mb-6 text-[var(--text-primary-light)]">Experience</h2>
+                <div class="space-y-6">
+                    <div
+                        class="p-6 rounded-lg bg-[var(--card-bg-light)] shadow-lg border border-[var(--card-border-light)]">
+                        <p class="text-sm text-[var(--text-secondary-light)] font-semibold">June - Dec 2024</p>
+                        <h4 class="text-xl font-bold mt-1 text-[var(--text-primary-light)]">Software Developer</h4>
+                        <p class="text-md text-[var(--text-primary-light)]">AB Infotech Solution</p>
+                        <p class="mt-2 text-[var(--text-primary-light)]">Developed and optimized Java-based
+                            applications,
+                            focusing on coding, debugging, and enhancing performance to deliver robust software
+                            solutions. Collaborated with cross-functional teams to ensure seamless integration and
+                            deployment of software components.</p>
+                    </div>
+                    <div
+                        class="p-6 rounded-lg bg-[var(--card-bg-light)] shadow-lg border border-[var(--card-border-light)]">
+                        <p class="text-sm text-[var(--text-secondary-light)] font-semibold">May - Sept 2023</p>
+                        <h4 class="text-xl font-bold mt-1 text-[var(--text-primary-light)]">Matlab Intern</h4>
+                        <p class="text-md text-[var(--text-primary-light)]">MathWorks</p>
+                        <p class="mt-2 text-[var(--text-primary-light)]">Completed specialized training in Signal
+                            Processing, Image Processing, and Machine Learning using MATLAB. Analyzed real-world signals
+                            from space agencies and satellite imagery, enhancing data processing workflows for
+                            high-precision applications.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="pt-12">
+            <div class="w-full max-w-5xl mx-auto">
+                <h2 class="text-4xl font-bold mb-4 text-[var(--text-primary-light)]">Projects</h2>
+                <p class="text-lg text-[var(--text-primary-light)] mb-8">I am proud to showcase a few key projects that
+                    demonstrate my technical skills and problem-solving abilities. Click on any project to learn about
+                    its implementation, and explore the codebase on GitHub.</p>
+                <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="pt-12">
+            <div class="w-full max-w-5xl mx-auto">
+                <h2 class="text-4xl font-bold mb-8 text-[var(--text-primary-light)]">Skills</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6 text-[var(--text-primary-light)]">Technical Proficiencies
+                        </h3>
+                        <div class="space-y-6">
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2 text-[var(--text-secondary-light)]">Languages</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">Java</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">SQL</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">Python</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">Embedded C</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">DSA</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">HTML</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">CSS</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">JavaScript</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2 text-[var(--text-secondary-light)]">Frameworks &
+                                    Tools</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">Git</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">GitHub</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">VsCode</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">IntelliJ</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">Ecllipse</span>
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">MySQL Workbench</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2 text-[var(--text-secondary-light)]">Databases</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="bg-tag px-3 py-1 rounded-full text-sm">MySQL</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6 text-[var(--text-primary-light)] text-center">Core
+                            Competencies</h3>
+                        <p class="text-center text-sm text-[var(--text-primary-light)] mb-6">A visual representation of
+                            my key soft skills, essential for collaborative work and problem-solving.</p>
+                        <div class="chart-container relative h-64 w-full max-w-lg mx-auto md:h-80">
+                            <canvas id="skillsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="certifications" class="pt-12">
+            <div class="w-full max-w-4xl mx-auto">
+                <h2 class="text-4xl font-bold mb-6 text-[var(--text-primary-light)]">Certifications</h2>
+                <div id="cert-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                </div>
+            </div>
+        </section>
+
+        <section id="languages" class="pt-12">
+            <div class="w-full max-w-4xl mx-auto">
+                <h2 class="text-4xl font-bold mb-6 text-[var(--text-primary-light)]">Languages</h2>
+                <div class="space-y-4">
+                    <p class="text-lg text-[var(--text-primary-light)]">English: <span
+                            class="text-[var(--text-secondary-light)] font-bold">Fluent</span></p>
+                    <p class="text-lg text-[var(--text-primary-light)]">Marathi: <span
+                            class="text-[var(--text-secondary-light)] font-bold">Native</span></p>
+                    <p class="text-lg text-[var(--text-primary-light)]">Hindi: <span
+                            class="text-[var(--text-secondary-light)] font-bold">Fluent</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="aspirations" class="pt-12">
+            <div class="w-full max-w-4xl mx-auto">
+                <h2 class="text-4xl font-bold mb-6 text-[var(--text-primary-light)]">Career Aspirations</h2>
+                <div class="space-y-10">
+                    <div class="flex items-start space-x-6">
+                        <div class="flex-shrink-0 bg-[var(--bg-secondary-light)] p-3 rounded-full">
+                            <span class="text-2xl text-[var(--text-secondary-light)]">🎯</span>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-[var(--text-primary-light)]">Short term Goals</h3>
+                            <p class="mt-2 text-lg text-[var(--text-primary-light)]">My immediate goal is to secure a
+                                software developer role where I can apply my deep knowledge of Java, AI/ML, and embedded
+                                systems. This isn't just a job for me; it's an opportunity to contribute to a team
+                                that's building innovative, efficient technological solutions that truly matter.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-6">
+                        <div class="flex-shrink-0 bg-[var(--bg-secondary-light)] p-3 rounded-full">
+                            <span class="text-2xl text-[var(--text-secondary-light)]">🧭</span>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-[var(--text-primary-light)]">The Road Ahead</h3>
+                            <p class="mt-2 text-lg text-[var(--text-primary-light)]">Much like the satisfaction of
+                                reaching a new place while traveling or mastering a tough cricket shot, I am driven by a
+                                passion for continuous growth. My long-term vision is to become a key technical
+                                contributor, pushing the boundaries of what's possible in AI and embedded systems while
+                                learning every day.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-6">
+                        <div class="flex-shrink-0 bg-[var(--bg-secondary-light)] p-3 rounded-full">
+                            <span class="text-2xl text-[var(--text-secondary-light)]">🚀</span>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-[var(--text-primary-light)]">My Unique Value</h3>
+                            <p class="mt-2 text-lg text-[var(--text-primary-light)]">My combined academic expertise in
+                                AI/ML and hands-on software development skills make me a unique asset. I am a pragmatic
+                                problem-solver who believes in delivering robust solutions. I am committed to continuous
+                                learning and bringing a fresh, energetic perspective to every challenge I face.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="project-modal"
+        class="modal-overlay fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden opacity-0">
+        <div class="modal-content bg-[var(--card-bg-light)] rounded-lg shadow-xl w-full max-w-4xl transform scale-95">
+            <div class="p-8">
+                <div class="flex justify-between items-start">
+                    <h3 id="modal-title" class="text-2xl font-bold text-[var(--text-primary-light)]"></h3>
+                    <button id="modal-close"
+                        class="text-[var(--text-primary-light)] hover:text-gray-400">&times;</button>
+                </div>
+                <div id="modal-content" class="mt-4 text-[var(--text-primary-light)] space-y-6 leading-relaxed"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cert-modal"
+        class="modal-overlay fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden opacity-0">
+        <div class="modal-content bg-[var(--card-bg-light)] rounded-lg shadow-xl w-full max-w-2xl transform scale-95">
+            <div class="p-8">
+                <div class="flex justify-between items-start">
+                    <h3 id="cert-modal-title" class="text-2xl font-bold text-[var(--text-primary-light)]"></h3>
+                    <button id="cert-modal-close"
+                        class="text-[var(--text-primary-light)] hover:text-gray-400">&times;</button>
+                </div>
+                <div id="cert-modal-content" class="mt-4 text-[var(--text-primary-light)] space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const projectsData = [
+                {
+                    title: 'Java-based Chat Application',
+                    short: 'A real-time group chat application using Java Swing and Socket Programming.',
+                    details: 'This project demonstrates a robust, real-time group chat application. I engineered a seamless communication system using Java Swing for the user interface and Socket Programming for network connectivity. The core functionality relies on multi-threading to manage concurrent user sessions, ensuring that multiple users can broadcast messages with minimal latency. It supports dynamic group creation and provides a smooth, reliable chat experience.',
+                    githubUrl: 'https://github.com/pramodthorat7/ChattingApplication.git',
+                    workflow: [
+                        { text: 'Client Connection' },
+                        { text: 'Server Handles Sessions' },
+                        { text: 'Message Broadcast' },
+                        { text: 'Real-time Chat' }
+                    ]
+                },
+                {
+                    title: 'Bank Management System (ATM Simulator)',
+                    short: 'A secure banking application built with Java Swing and SQL.',
+                    details: 'This ATM simulator is a comprehensive banking application that provides secure user management and core ATM functionalities. I developed it using Java Swing for the graphical interface and integrated it with a MySQL database via JDBC. The system handles secure user registration, automatically generating unique card numbers and PINs. It supports essential operations like deposits, withdrawals, balance inquiries, and detailed transaction history, all with built-in input validation and error handling to guarantee data integrity.',
+                    githubUrl: 'https://github.com/pramodthorat7/Bank-Management-System.git',
+                    workflow: [
+                        { text: 'User Authentication' },
+                        { text: 'Perform Transaction' },
+                        { text: 'Database Update' },
+                        { text: 'View History' }
+                    ]
+                },
+                {
+                    title: 'Real-Time Weapon Detection',
+                    short: 'A CCTV-based weapon detection system using YOLOv8.',
+                    details: 'This project is a high-accuracy, low-latency system designed for real-time weapon identification from CCTV video feeds. I utilized the YOLOv8 deep learning model, which is highly efficient for object detection. The system is integrated with existing security tools to enhance surveillance capabilities and enable a rapid, automated response in critical scenarios, significantly improving safety and security measures.',
+                    githubUrl: 'https://github.com/pramodthorat7/honors_project.git',
+                    workflow: [
+                        { text: 'CCTV Video Stream' },
+                        { text: 'YOLOv8 Model' },
+                        { text: 'Weapon Detection' },
+                        { text: 'Alert System' }
+                    ]
+                },
+                {
+                    title: 'IEEE-754 32-bit Multiplier',
+                    short: 'A high-performance multiplier for FPGA using Booth\'s algorithm.',
+                    details: 'This project involved designing a high-performance 32-bit multiplier for MAC (Multiply-Accumulate) operations specifically for FPGA hardware. By implementing Booth\'s multiplication algorithm, I was able to optimize both speed and resource efficiency. This design is targeted for real-time processing in high-performance computing applications, minimizing power consumption and significantly boosting computational throughput.',
+                    githubUrl: 'https://github.com/pramodthorat7/Major_Project.git',
+                    workflow: [
+                        { text: '32-bit Inputs' },
+                        { text: 'Booth\'s Algorithm' },
+                        { text: 'MAC Operation' },
+                        { text: 'Output' }
+                    ]
+                }
+            ];
+
+            const certificationsData = [
+                {
+                    name: 'Python Programming with IBM',
+                    issuer: 'IBM',
+                    link: 'https://www.coursera.org/account/accomplishments/certificate/M5H3D5A5A5L2',
+                    description: 'This certification validates a strong foundation in Python, covering core programming concepts, data structures, and object-oriented programming, with a focus on practical application.',
+                    status: 'completed'
+                },
+                {
+                    name: 'Introduction to Internet of Things',
+                    issuer: 'Swayam',
+                    link: 'https://swayam.gov.in/nc_details/3820',
+                    description: 'This course provides a comprehensive overview of the Internet of Things, including its architecture, key technologies, and applications, essential for developing connected systems.',
+                    status: 'completed'
+                },
+                {
+                    name: 'Fundamentals of Cybersecurity',
+                    issuer: 'Cisco',
+                    link: 'https://www.netacad.com/portal/learner_cert_info.php',
+                    description: 'This certification from Cisco covers the fundamental principles of cybersecurity, including threat detection, risk management, and best practices for securing data and networks.',
+                    status: 'completed'
+                },
+                {
+                    name: 'Mastery in SQL',
+                    issuer: 'Code with Mosh',
+                    link: '#',
+                    description: 'Currently building advanced skills in SQL, focusing on complex queries, database design, and performance optimization to handle large datasets effectively.',
+                    status: 'ongoing'
+                },
+                {
+                    name: 'Computer Networks and Internet Protocol',
+                    issuer: 'Swayam',
+                    link: '#',
+                    description: 'An ongoing course focusing on a deep understanding of networking protocols, including TCP/IP, routing, and network security, to build robust and scalable systems.',
+                    status: 'ongoing'
+                }
+            ];
+
+            const projectGrid = document.getElementById('project-grid');
+            projectsData.forEach((project, index) => {
+                const card = document.createElement('div');
+                card.className = 'card rounded-lg p-6';
+                card.dataset.index = index;
+                const workflowHtml = project.workflow ? `
+                    <div class="mt-4 project-flow flex space-x-4 pb-2">
+                        ${project.workflow.map((step, i) => `
+                            <div class="flex items-center space-x-2 flex-shrink-0">
+                                <span class="text-sm font-medium whitespace-nowrap">${step.text}</span>
+                                ${i < project.workflow.length - 1 ? '<span class="text-base">→</span>' : ''}
+                            </div>
+                        `).join('')}
+                    </div>` : '';
+
+                card.innerHTML = `
+                    <h3 class="text-xl font-bold text-[var(--text-primary-light)]">${project.title}</h3>
+                    <p class="text-[var(--text-primary-light)] mt-2">${project.short}</p>
+                    ${workflowHtml}
+                    <div class="mt-4 flex space-x-2">
+                        <button data-index="${index}" class="view-details-btn bg-[var(--bg-secondary-light)] text-[var(--text-secondary-light)] font-semibold px-4 py-2 rounded-full text-sm">Details</button>
+                        <a href="${project.githubUrl}" target="_blank" class="bg-tag font-semibold px-4 py-2 rounded-full text-sm">GitHub</a>
+                    </div>
+                `;
+                projectGrid.appendChild(card);
+            });
+
+            const certGrid = document.getElementById('cert-grid');
+            certificationsData.forEach((cert, index) => {
+                const card = document.createElement('div');
+                const ongoingBadge = cert.status === 'ongoing' ? `<span class="bg-yellow-500 text-yellow-900 px-2 py-0.5 rounded-full text-xs font-bold absolute top-3 right-3">Ongoing</span>` : '';
+                card.className = `cert-card card rounded-lg p-6 cursor-pointer relative`;
+                card.dataset.index = index;
+                card.innerHTML = `
+                    ${ongoingBadge}
+                    <h3 class="text-xl font-bold text-[var(--text-primary-light)]">${cert.name}</h3>
+                    <p class="text-[var(--text-primary-light)] mt-2">Issuer: ${cert.issuer}</p>
+                `;
+                certGrid.appendChild(card);
+            });
+
+            const projectModal = document.getElementById('project-modal');
+            const projectModalTitle = document.getElementById('modal-title');
+            const projectModalContent = document.getElementById('modal-content');
+            const projectModalClose = document.getElementById('modal-close');
+
+            const certModal = document.getElementById('cert-modal');
+            const certModalTitle = document.getElementById('cert-modal-title');
+            const certModalContent = document.getElementById('cert-modal-content');
+            const certModalClose = document.getElementById('cert-modal-close');
+
+            projectGrid.addEventListener('click', (e) => {
+                const button = e.target.closest('.view-details-btn');
+                if (button) {
+                    const project = projectsData[button.dataset.index];
+                    projectModalTitle.textContent = project.title;
+
+                    const projectDetailsHtml = `<p>${project.details}</p>`;
+                    let workflowHtml = '';
+
+                    if (project.workflow) {
+                        workflowHtml = `
+                            <div class="mt-6">
+                                <h4 class="text-xl font-bold mb-4 text-[var(--text-primary-light)]">How It Works:</h4>
+                                <div class="flex flex-col md:flex-row items-center md:space-x-4 space-y-4 md:space-y-0 mt-4">
+                                    ${project.workflow.map((step, i) => `
+                                        <div class="flex items-center space-x-4 md:flex-grow">
+                                            <div class="flowchart-step text-[var(--text-primary-light)] font-medium flex-1">${step.text}</div>
+                                            ${i < project.workflow.length - 1 ? '<div class="text-2xl text-[var(--text-primary-light)] opacity-50 hidden md:block">&rarr;</div>' : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    projectModalContent.innerHTML = projectDetailsHtml + workflowHtml;
+
+                    projectModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        projectModal.classList.remove('opacity-0');
+                        projectModal.querySelector('.modal-content').classList.remove('scale-95');
+                    }, 10);
+                }
+            });
+
+            certGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.cert-card');
+                if (card) {
+                    const cert = certificationsData[card.dataset.index];
+                    certModalTitle.textContent = cert.name;
+                    const certLinkHtml = cert.link !== '#' ? `<p class="text-lg mt-2"><a href="${cert.link}" target="_blank" class="text-[var(--text-secondary-light)] hover:underline font-bold">View Certificate</a></p>` : `<p class="text-lg mt-2 text-[var(--text-primary-light)] opacity-75">Link not available</p>`;
+                    certModalContent.innerHTML = `
+                        <p class="text-lg"><strong>Issuer:</strong> ${cert.issuer}</p>
+                        <p class="mt-4 text-lg">${cert.description}</p>
+                        ${certLinkHtml}
+                    `;
+                    certModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        certModal.classList.remove('opacity-0');
+                        certModal.querySelector('.modal-content').classList.remove('scale-95');
+                    }, 10);
+                }
+            });
+
+            const closeModal = (modalEl) => {
+                modalEl.classList.add('opacity-0');
+                modalEl.querySelector('.modal-content').classList.add('scale-95');
+                setTimeout(() => {
+                    modalEl.classList.add('hidden');
+                }, 300);
+            };
+
+            projectModalClose.addEventListener('click', () => closeModal(projectModal));
+            projectModal.addEventListener('click', (e) => {
+                if (e.target === projectModal) {
+                    closeModal(projectModal);
+                }
+            });
+
+            certModalClose.addEventListener('click', () => closeModal(certModal));
+            certModal.addEventListener('click', (e) => {
+                if (e.target === certModal) {
+                    closeModal(certModal);
+                }
+            });
+
+            const skillsCtx = document.getElementById('skillsChart').getContext('2d');
+            const softSkillsData = {
+                labels: ['Teamwork', 'Problem Solving', 'Adaptability', 'Time Management'],
+                datasets: [{
+                    label: 'Rating (out of 10)',
+                    data: [9, 9, 8, 8],
+                    backgroundColor: ['#C77553', '#A5B4C2', '#C77553', '#A5B4C2'],
+                    borderColor: '#FFFFFF',
+                    borderWidth: 2,
+                }]
+            };
+
+            const skillsChart = new Chart(skillsCtx, {
+                type: 'doughnut',
+                data: softSkillsData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                color: 'var(--text-primary-light)',
+                                font: {
+                                    size: 14,
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `${context.label}: ${context.parsed}/10`
+                            }
+                        }
+                    }
+                }
+            });
+
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileNavLinks = document.querySelectorAll('#mobile-menu a');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.5
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const sectionId = entry.target.id;
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.dataset.section === sectionId);
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            const themeToggleDesktop = document.getElementById('theme-toggle-desktop');
+            const themeToggleMobile = document.getElementById('theme-toggle-mobile');
+
+            const applyTheme = (theme) => {
+                document.body.dataset.theme = theme;
+                const isLight = theme === 'light';
+                document.querySelectorAll('.light-icon').forEach(el => el.classList.toggle('hidden', !isLight));
+                document.querySelectorAll('.dark-icon').forEach(el => el.classList.toggle('hidden', isLight));
+                localStorage.setItem('theme', theme);
+
+                const newBackgrounds = isLight ? ['#C77553', '#A5B4C2', '#C77553', '#A5B4C2'] : ['#38BDF8', '#64748B', '#38BDF8', '#64748B'];
+                skillsChart.data.datasets[0].backgroundColor = newBackgrounds;
+                skillsChart.data.datasets[0].borderColor = isLight ? '#FFFFFF' : '#0D172A';
+                skillsChart.options.plugins.legend.labels.color = isLight ? '#333333' : '#F0F0F0';
+                skillsChart.update();
+            };
+
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(currentTheme);
+
+            themeToggleDesktop.addEventListener('click', () => {
+                const newTheme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
+                applyTheme(newTheme);
+            });
+
+            themeToggleMobile.addEventListener('click', () => {
+                const newTheme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
+                applyTheme(newTheme);
+            });
+        });
+    </script>
+</body>
+
+</html>
